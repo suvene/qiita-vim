@@ -287,12 +287,17 @@ function! s:open_item(api, uuid)
   echon 'Getting item... '
   redraw
 
-  let item = a:api.item(a:uuid)
-  call setline(1, [webapi#html#decodeEntityReference(item.title)]+split(item.raw_body, "\n"))
-  setlocal buftype=acwrite bufhidden=delete noswapfile
-  setlocal nomodified
-  setlocal ft=markdown
-  au! BufWriteCmd <buffer> call s:write_action(expand("<amatch>"))
+  try
+    let item = a:api.item(a:uuid)
+    call setline(1, [webapi#html#decodeEntityReference(item.title)]+split(item.raw_body, "\n"))
+    setlocal buftype=acwrite bufhidden=delete noswapfile
+    setlocal nomodified
+    setlocal ft=markdown
+    au! BufWriteCmd <buffer> call s:write_action(expand("<amatch>"))
+  catch
+    echohl ErrorMsg | echomsg v:exception | echohl None
+    return
+  endtry
 endfunction
 
 function! s:list_action()
